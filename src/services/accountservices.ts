@@ -1,0 +1,95 @@
+import express, { Request, Response } from "express";
+import { Account } from "@entities/account";
+import { AppDataSource } from "@config/data-source";
+import { genSalt, hash, compare } from "bcrypt-ts";
+import jwt from "jsonwebtoken";
+
+// Cài đặt secret key (đảm bảo không tiết lộ key này ra ngoài)
+const JWT_SECRET = "chuatecuanhungcaybut";  // Nên lưu trong environment variables
+
+export default class AccountServices {
+    // Tạo tài khoản mới
+    static async createAccount(req: Request, res: Response) {
+        try {
+            const { username, email, password } = req.body;
+
+            const accountRepo = AppDataSource.getRepository(Account);
+
+            const existing = await accountRepo.findOneBy({ email });
+            if (existing) {
+                return res.status(400).json({ message: "Email already registered" });
+            }
+
+            const salt = await genSalt(10);
+            const hashedPassword = await hash(password, salt);
+
+            const newAccount = new Account();
+            newAccount.username = username;
+            newAccount.email = email;
+            newAccount.password = hashedPassword;
+            newAccount.createdAt = new Date();
+            newAccount.updatedAt = new Date();
+
+            await accountRepo.save(newAccount);
+
+            return res.status(201).json({
+                message: "Account created successfully",
+                account: {
+                    id: newAccount.id,
+                    username: newAccount.username,
+                    email: newAccount.email
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Server error", error });
+        }
+    }
+
+    // Đăng nhập và tạo JWT
+    static async Login(req: Request, res: Response) {
+        try {
+            const { email, password } = req.body;
+
+            const accountRepo = AppDataSource.getRepository(Account);
+            const account = await accountRepo.findOneBy({ email });
+
+            if (!account) {
+                return res.status(400).json({ message: "Invalid email or password" });
+            }
+
+            // Kiểm tra mật khẩu
+            const isPasswordValid = await compare(password, account.password!);
+            if (!isPasswordValid) {
+                return res.status(400).json({ message: "Invalid email or password" });
+            }
+
+            // Tạo JWT token
+            const token = jwt.sign(
+                { id: account.id, email: account.email, username: account.username },
+                JWT_SECRET,
+                { expiresIn: "1h" }
+            );
+    
+            res.cookie("token", token, {
+                httpOnly: true,     // Bảo vệ khỏi XSS
+                secure: false,      // Chỉ đặt true nếu dùng HTTPS (local thì để false)
+                sameSite: "strict", // Ngăn CSRF (optional)
+                maxAge: 3600000     // Hết hạn sau 1h
+            });
+
+            return res.status(200).json({
+                message: "Login successful",
+                token,
+                account: {
+                    id: account.id,
+                    username: account.username,
+                    email: account.email
+                }
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Server error", error });
+        }
+    }
+}
