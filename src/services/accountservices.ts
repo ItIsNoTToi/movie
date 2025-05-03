@@ -4,9 +4,6 @@ import { AppDataSource } from "@config/data-source";
 import { genSalt, hash, compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
 
-// Cài đặt secret key (đảm bảo không tiết lộ key này ra ngoài)
-const JWT_SECRET = "chuatecuanhungcaybut";  // Nên lưu trong environment variables
-
 export default class AccountServices {
     // Tạo tài khoản mới
     static async createAccount(req: Request, res: Response) {
@@ -67,7 +64,7 @@ export default class AccountServices {
             // Tạo JWT token
             const token = jwt.sign(
                 { id: account.id, email: account.email, username: account.username },
-                JWT_SECRET,
+                process.env.JWT_SECRET as string,
                 { expiresIn: "1h" }
             );
     
@@ -80,16 +77,20 @@ export default class AccountServices {
 
             return res.status(200).json({
                 message: "Login successful",
-                token,
-                account: {
-                    id: account.id,
-                    username: account.username,
-                    email: account.email
-                }
+                // token,
+                // account: {
+                //     id: account.id,
+                //     username: account.username,
+                //     email: account.email
+                // }
             });
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: "Server error", error });
         }
+    }
+
+    static async UpdateInformation(req: Request, res: Response){
+
     }
 }
