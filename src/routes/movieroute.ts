@@ -5,4 +5,20 @@ const Routes = express.Router();
 
 Routes.post('/createMovie', async (req: Request, res: Response) => await MovieController.createMovie(req, res));
 
+Routes.post('/createEpisode', async (req: Request, res: Response) => await MovieController.createEpisode(req, res));
+
+Routes.get('/movie/:id/:episode', async (req: Request, res: Response) => {
+    await MovieController.getMovieByIdAndEpisode(req, res);
+});
+
+Routes.get('/movie/:id', async (req: Request, res: Response) => {
+    await MovieController.getMoviebyId(req, res);
+});
+  
+Routes.get('/movie', async (req: Request, res: Response) => {
+    await MovieController.getMovie(req, res);
+});
+
+
+
 export default Routes;

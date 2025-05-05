@@ -21,6 +21,12 @@ import movieroutes from '@routes/movieroute';
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const app: Express = express();
 const server = http.createServer(app);
+app.use(cors({
+  origin: 'http://localhost:3001', // Frontend URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Các phương thức HTTP bạn muốn cho phép
+  allowedHeaders: ['Content-Type', 'Authorization'], // Các header được phép
+}));
+
 const host = '0.0.0.0';
 const port = +(process.env.PORT || 3000);
 
