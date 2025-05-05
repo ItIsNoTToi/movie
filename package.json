@@ -36,6 +36,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
     "reflect-metadata": "^0.2.2",
+    "tsc-alias": "^1.8.15",
     "typeorm": "^0.3.22"
   }
 }
