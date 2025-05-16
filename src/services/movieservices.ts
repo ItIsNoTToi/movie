@@ -4,6 +4,7 @@ import { Movie } from "@entities/movie";
 import { AppDataSource } from "@config/data-source";
 import { Genre } from "@entities/genre";
 import { Episode } from "@entities/episode";
+import jwt from "jsonwebtoken";
 
 export default class MovieServices {
     static async createMovie(req: Request, res: Response): Promise<any> {
@@ -110,17 +111,31 @@ export default class MovieServices {
 
     static async getMovie(req: Request, res: Response): Promise<any> {
         try {
+            const JWT_SECRET = process.env.JWT_SECRET_2;
+            const token = req.cookies?.token;
+            const movieRepository = AppDataSource.getRepository(Movie);
+            const movies = await movieRepository.find();
 
-            const movieEpository = AppDataSource.getRepository(Movie);
-            const movie = await movieEpository.find();
-    
-            if (!movie) {
-                return res.status(404).json({ message: "movie not found" });
+            if (!token) {
+                return res.status(201).json({movies, user: null});
+                // return res.status(401).json({ message: "Token is required" });
             }
-    
-            return res.status(200).json(movie);
+
+            let decoded;
+            try {
+                decoded = jwt.verify(token, JWT_SECRET!);
+            } catch (err) {
+                return res.status(403).json({ message: "Invalid token" });
+            }
+
+            // console.log(JSON.stringify(decoded, null, 2));
+
+            return res.status(200).json({
+                movies,
+                user: decoded,
+            });
         } catch (error) {
-            console.error("Error fetching movie:", error);
+            console.error("Error fetching movie:", error instanceof Error ? error.message : error);
             return res.status(500).json({ message: "Internal server error" });
         }
     }

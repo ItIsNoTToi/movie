@@ -10,6 +10,10 @@ export default class AccountController {
     static async Login(req: Request, res: Response) {
         await AccountServices.Login(req, res);
     }
+
+    static async Logout(req: Request, res: Response) {
+        await AccountServices.logout(req, res);
+    }
     
     static async UpdateInformation (req: Request, res: Response){
         await AccountServices.UpdateInformation(req,res);

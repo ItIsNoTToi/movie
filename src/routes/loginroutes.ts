@@ -10,4 +10,6 @@ Routes.post('/register', async (req: Request, res: Response) => await AccountCon
 // Đăng nhập
 Routes.post('/login', async (req: Request, res: Response) => await AccountController.Login(req, res));
 
+Routes.post('/logout', async (req: Request, res: Response) => await AccountController.Logout(req, res));
+
 export default Routes;

@@ -64,7 +64,7 @@ export default class AccountServices {
             // Tạo JWT token
             const token = jwt.sign(
                 { id: account.id, email: account.email, username: account.username },
-                process.env.JWT_SECRET as string,
+                process.env.JWT_SECRET_1 as string,
                 { expiresIn: "1h" }
             );
     
@@ -72,12 +72,12 @@ export default class AccountServices {
                 httpOnly: true,     // Bảo vệ khỏi XSS
                 secure: false,      // Chỉ đặt true nếu dùng HTTPS (local thì để false)
                 sameSite: "strict", // Ngăn CSRF (optional)
-                maxAge: 3600000     // Hết hạn sau 1h
+                maxAge: 3600000 * 24 * 7,    // Hết hạn sau 1h
             });
 
             return res.status(200).json({
                 message: "Login successful",
-                // token,
+                // token: token,
                 // account: {
                 //     id: account.id,
                 //     username: account.username,
@@ -92,5 +92,21 @@ export default class AccountServices {
 
     static async UpdateInformation(req: Request, res: Response){
 
+    }
+
+    static async logout(req: Request, res: Response) {
+        try {
+            // Xóa cookie chứa token
+            res.clearCookie("token", {
+                httpOnly: true,
+                secure: false,      // true nếu dùng HTTPS
+                sameSite: "strict", // nếu bạn có cấu hình SameSite
+            });
+    
+            return res.status(200).json({ message: "Logout successful" });
+        } catch (error) {
+            console.error("Logout error:", error);
+            return res.status(500).json({ message: "Server error" });
+        }
     }
 }
