@@ -111,34 +111,34 @@ export default class MovieServices {
 
     static async getMovie(req: Request, res: Response): Promise<any> {
         try {
-            const JWT_SECRET = process.env.JWT_SECRET_2;
+            const JWT_SECRET = process.env.JWT_SECRET!;
             const token = req.cookies?.token;
+            // console.log(token);
+            // console.log(JWT_SECRET);
+
             const movieRepository = AppDataSource.getRepository(Movie);
             const movies = await movieRepository.find();
 
             if (!token) {
-                return res.status(201).json({movies, user: null});
-                // return res.status(401).json({ message: "Token is required" });
+                return res.status(200).json({ movies, user: null });
             }
 
-            let decoded;
             try {
-                decoded = jwt.verify(token, JWT_SECRET!);
+                const decoded = jwt.verify(token, JWT_SECRET);
+                return res.status(200).json({
+                    movies,
+                    user: decoded,
+                });
             } catch (err) {
+                console.error("JWT verify error:", err);
                 return res.status(403).json({ message: "Invalid token" });
             }
-
-            // console.log(JSON.stringify(decoded, null, 2));
-
-            return res.status(200).json({
-                movies,
-                user: decoded,
-            });
         } catch (error) {
             console.error("Error fetching movie:", error instanceof Error ? error.message : error);
             return res.status(500).json({ message: "Internal server error" });
         }
     }
+
 
     static async getMoviebyId(req: Request, res: Response): Promise<any> {
         try {

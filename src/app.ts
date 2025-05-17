@@ -29,6 +29,7 @@ app.use(cors({
   origin: ['http://localhost:3001', 'https://movie-front-iota.vercel.app', 'https://abcdefg.ngrok.io'],  // Thêm URL Ngrok vào
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, 
 }));
 
 // socket.ip - send message ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

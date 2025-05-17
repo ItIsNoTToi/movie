@@ -71,13 +71,13 @@ export default class AccountServices {
             res.cookie("token", token, {
                 httpOnly: true,     // Bảo vệ khỏi XSS
                 secure: false,      // Chỉ đặt true nếu dùng HTTPS (local thì để false)
-                sameSite: "strict", // Ngăn CSRF (optional)
+                sameSite: "lax", // Ngăn CSRF (optional)
                 maxAge: 3600000 * 24 * 7,    // Hết hạn sau 1h
             });
 
             return res.status(200).json({
                 message: "Login successful",
-                // token: token,
+                token: token,
                 // account: {
                 //     id: account.id,
                 //     username: account.username,
@@ -100,8 +100,9 @@ export default class AccountServices {
             res.clearCookie("token", {
                 httpOnly: true,
                 secure: false,      // true nếu dùng HTTPS
-                sameSite: "strict", // nếu bạn có cấu hình SameSite
+                sameSite: "lax", // nếu bạn có cấu hình SameSite
             });
+        
     
             return res.status(200).json({ message: "Logout successful" });
         } catch (error) {
