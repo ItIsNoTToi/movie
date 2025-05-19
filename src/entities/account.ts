@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
 import { DetailAccount } from "./detailaccount";
+import { Admin } from "./admin";
 
 @Entity('account')
 export class Account {
@@ -23,4 +24,7 @@ export class Account {
 
     @OneToOne(() => DetailAccount, detail => detail.account, { cascade: true })
     detailAccount?: DetailAccount;
+
+    @OneToOne(() => Admin, admin => admin.account)
+    admin?: Admin;
 }

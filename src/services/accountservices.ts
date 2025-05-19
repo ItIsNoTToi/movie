@@ -3,6 +3,10 @@ import { Account } from "@entities/account";
 import { AppDataSource } from "@config/data-source";
 import { genSalt, hash, compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
+import { Admin } from "@entities/admin";
+import { Role } from "@entities/admin";
+import { DetailAccount } from "@entities/detailaccount";
+
 
 export default class AccountServices {
     // Tạo tài khoản mới
@@ -26,8 +30,14 @@ export default class AccountServices {
             newAccount.password = hashedPassword;
             newAccount.createdAt = new Date();
             newAccount.updatedAt = new Date();
-
+            
             await accountRepo.save(newAccount);
+
+            const newRole = new Admin();
+            newRole.account = newAccount;
+            newRole.role = Role.User;
+
+            await AppDataSource.getRepository(Admin).save(newRole);
 
             return res.status(201).json({
                 message: "Account created successfully",
@@ -58,8 +68,22 @@ export default class AccountServices {
             // Kiểm tra mật khẩu
             const isPasswordValid = await compare(password, account.password!);
             if (!isPasswordValid) {
-                return res.status(400).json({ message: "Invalid email or password" });
+                return res.status(404).json({ message: "Invalid email or password" });
             }
+
+            // console.log(JSON.stringify(account));
+
+            const role = await AppDataSource.getRepository(Admin).findOne({
+                where:{
+                    account: account
+                }
+            })
+
+            if(!role){
+                return res.status(404).json({ message: "Account don't have role" });
+            }
+
+
 
             // Tạo JWT token
             const token = jwt.sign(
@@ -78,6 +102,7 @@ export default class AccountServices {
             return res.status(200).json({
                 message: "Login successful",
                 token: token,
+                role: role.role
                 // account: {
                 //     id: account.id,
                 //     username: account.username,

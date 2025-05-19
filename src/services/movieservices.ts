@@ -102,7 +102,7 @@ export default class MovieServices {
                 return res.status(404).json({ message: "Episode not found" });
             }
     
-            return res.status(200).json(episode);
+            return res.status(200).json({ episode });
         } catch (error) {
             console.error("Error fetching episode:", error);
             return res.status(500).json({ message: "Internal server error" });
@@ -156,7 +156,8 @@ export default class MovieServices {
                 return res.status(404).json({ message: "Movie not found" });
             }
     
-            return res.status(200).json(movie);
+            return res.status(200).json({ movie });
+
         } catch (error) {
             console.error("Error fetching movie:", error);
             return res.status(500).json({ message: "Internal server error" });

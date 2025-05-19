@@ -3,10 +3,6 @@ import express, { Request, Response } from "express";
 
 const Routes = express.Router();
 
-Routes.post('/createMovie', async (req: Request, res: Response) => await MovieController.createMovie(req, res));
-
-Routes.post('/createEpisode', async (req: Request, res: Response) => await MovieController.createEpisode(req, res));
-
 Routes.get('/movie/:id/:episode', async (req: Request, res: Response) => {
     await MovieController.getMovieByIdAndEpisode(req, res);
 });
