@@ -117,7 +117,9 @@ export default class MovieServices {
             // console.log(JWT_SECRET);
 
             const movieRepository = AppDataSource.getRepository(Movie);
-            const movies = await movieRepository.find();
+            const movies = await movieRepository.find({
+                relations:['genres', 'episodes']
+            });
 
             if (!token) {
                 return res.status(200).json({ movies, user: null });
