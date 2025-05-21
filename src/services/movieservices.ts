@@ -11,7 +11,7 @@ export default class MovieServices {
         try {
             const {
                 title, description, releaseDate, director,
-                duration, language, posterUrl, rating, isActive, genres
+                duration, language, posterUrl, rating, isActive, /*genres*/
             } = req.body;
     
             const newMovie = new Movie();
@@ -24,19 +24,19 @@ export default class MovieServices {
             newMovie.posterUrl = posterUrl;
             newMovie.rating = rating;
             newMovie.isActive = isActive;
-    
+            
             // Tìm tất cả genres tương ứng
-            const genreEntities = await Promise.all(
-                genres.map((genreId: number) =>
-                    AppDataSource.getRepository(Genre).findOne({ where: { id: genreId } })
-                )
-            );
+            // const genreEntities = await Promise.all(
+            //     genres.map((genreId: number) =>
+            //         AppDataSource.getRepository(Genre).findOne({ where: { id: genreId } })
+            //     )
+            // );
     
-            // Lọc ra những genre tồn tại
-            newMovie.genres = genreEntities.filter((genre): genre is Genre => genre !== null);
+            // // Lọc ra những genre tồn tại
+            // newMovie.genres = genreEntities.filter((genre): genre is Genre => genre !== null);
     
             await AppDataSource.getRepository(Movie).save(newMovie);
-            res.status(201).json({ message: "Movie created successfully", movie: newMovie });
+            res.status(201).json({ message: "Movie created successfully", movies: newMovie });
     
         } catch (error) {
             console.error("Error creating movie:", error);
