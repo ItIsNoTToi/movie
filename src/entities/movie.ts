@@ -9,6 +9,7 @@ import {
   import "reflect-metadata";
   import { Genre } from "./genre";
   import { Episode } from "./episode";
+import { Hashtag } from "./hashtag";
   
   @Entity('movie')
   export class Movie {
@@ -49,5 +50,9 @@ import {
   
     @OneToMany(() => Episode, episode => episode.movie, { cascade: true })
     episodes!: Episode[];
+
+    @ManyToMany(() => Hashtag, hashtag => hashtag.movies, { cascade: true })
+    @JoinTable()
+    hashtags!: Hashtag[];
   }
   

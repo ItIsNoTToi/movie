@@ -5,6 +5,7 @@ import { AppDataSource } from "@config/data-source";
 import { Genre } from "@entities/genre";
 import { Episode } from "@entities/episode";
 import jwt from "jsonwebtoken";
+import { Hashtag } from "@entities/hashtag";
 
 export default class MovieServices {
     static async createMovie(req: Request, res: Response): Promise<any> {
@@ -24,6 +25,10 @@ export default class MovieServices {
             newMovie.posterUrl = posterUrl;
             newMovie.rating = rating;
             newMovie.isActive = isActive;
+            newMovie.hashtags = [
+                { name: "#action" },
+                { name: "#newrelease" }
+            ] as Hashtag[];
             
             // Tìm tất cả genres tương ứng
             // const genreEntities = await Promise.all(
@@ -40,6 +45,25 @@ export default class MovieServices {
     
         } catch (error) {
             console.error("Error creating movie:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    static async deleteMovie(req: Request, res: Response): Promise<any> {
+        try {
+            const id = Number(req.params.id);
+            const movieRepo = AppDataSource.getRepository(Movie);
+
+            const movie = await movieRepo.findOne({ where: { id } });
+            if (!movie) {
+            return res.status(400).json({ message: "Can't find movie with id = " + id });
+            }
+
+            await movieRepo.delete(id);
+
+            res.status(200).json({ message: "Movie deleted successfully" });
+        } catch (error) {
+            console.error("Error deleting movie:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     }

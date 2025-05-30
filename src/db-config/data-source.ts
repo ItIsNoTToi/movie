@@ -10,6 +10,7 @@ import { DetailAccount } from "@entities/detailaccount";
 import { Genre } from "@entities/genre";
 import { Episode } from "@entities/episode";
 import { Admin } from "@entities/admin";
+import { Hashtag } from "@entities/hashtag";
 
 export const AppDataSource = new DataSource({
     type: process.env.MYSQL_TYPE as "mysql",
@@ -20,7 +21,7 @@ export const AppDataSource = new DataSource({
     database: process.env.MYSQL_NAME,
     synchronize: true,
     logging: false,
-    entities: [Movie, Account, DetailAccount, Genre, Episode, Admin ],
+    entities: [Movie, Account, DetailAccount, Genre, Episode, Admin, Hashtag ],
     subscribers: [],
     migrations: ["src/migrations/*.ts"],
 })

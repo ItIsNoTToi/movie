@@ -10,4 +10,7 @@ export default class GenresController {
         await GenresServices.createGenres(req, res);
     }
     
+    static async getGenres(req: Request, res: Response): Promise<any> {
+        await GenresServices.getGenres(req, res);
+    }
 }

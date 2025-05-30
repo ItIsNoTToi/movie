@@ -8,6 +8,8 @@ Routes.get('/9710010910511011297103101', async (req: Request, res: Response) => 
 
 Routes.post('/9710010910511011297103101/createMovie', async (req: Request, res: Response) => await MovieController.createMovie(req, res));
 
+Routes.delete('/9710010910511011297103101/deleteMovie/:id', async (req: Request, res: Response) => await MovieController.deleteMovie(req, res));
+
 Routes.post('/9710010910511011297103101/createEpisode', async (req: Request, res: Response) => await MovieController.createEpisode(req, res));
 
 

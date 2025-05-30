@@ -22,5 +22,22 @@ export default class GenresServices {
             res.status(500).json({ error: "Internal server error" });
         }
     }
-    
+
+    static async getGenres(req: Request, res: Response): Promise<any> {
+        try {
+            const genres = await AppDataSource.getRepository(Genre).find();
+
+            if (genres.length === 0) {
+                return res.status(404).json({ message: "No genres found" });
+            }
+
+            res.status(200).json({ 
+                message: "Genres fetched successfully", 
+                data: genres 
+            });
+        } catch (error) {
+            console.error("Error fetching genres:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
 }
