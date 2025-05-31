@@ -6,43 +6,54 @@ import { Genre } from "@entities/genre";
 import { Episode } from "@entities/episode";
 import jwt from "jsonwebtoken";
 import { Hashtag } from "@entities/hashtag";
+import { In } from "typeorm";
 
 export default class MovieServices {
+
     static async createMovie(req: Request, res: Response): Promise<any> {
         try {
-            const {
-                title, description, releaseDate, director,
-                duration, language, posterUrl, rating, isActive, /*genres*/
-            } = req.body;
-    
+            // chua luu genres
+            const data = req.body;
+            //console.log(data);
+
+            const hashtagNames = ['#action', '#newrelease'];
+
+            const hashtagRepo = AppDataSource.getRepository(Hashtag);
+
+            // Tìm các hashtag đã tồn tại
+            const existingHashtags = await hashtagRepo.find({
+                where: { name: In(hashtagNames) }
+            });
+
+            // Lấy ra danh sách name đã tồn tại
+            const existingNames = existingHashtags.map(h => h.name);
+
+            // Tạo những hashtag chưa có
+            const newHashtags = hashtagNames
+                .filter(name => !existingNames.includes(name))
+                .map(name => hashtagRepo.create({ name }));
+
+            // Lưu mới vào DB
+            await hashtagRepo.save(newHashtags);
+
+            // Tổng hợp hashtag để gán vào phim
+            const allHashtags = [...existingHashtags, ...newHashtags];
+
             const newMovie = new Movie();
-            newMovie.title = title;
-            newMovie.description = description;
-            newMovie.releaseDate = releaseDate;
-            newMovie.director = director;
-            newMovie.duration = duration;
-            newMovie.language = language;
-            newMovie.posterUrl = posterUrl;
-            newMovie.rating = rating;
-            newMovie.isActive = isActive;
-            newMovie.hashtags = [
-                { name: "#action" },
-                { name: "#newrelease" }
-            ] as Hashtag[];
-            
-            // Tìm tất cả genres tương ứng
-            // const genreEntities = await Promise.all(
-            //     genres.map((genreId: number) =>
-            //         AppDataSource.getRepository(Genre).findOne({ where: { id: genreId } })
-            //     )
-            // );
-    
-            // // Lọc ra những genre tồn tại
-            // newMovie.genres = genreEntities.filter((genre): genre is Genre => genre !== null);
-    
+            newMovie.title = data.title;
+            newMovie.description = data.description;
+            newMovie.releaseDate = data.releaseDate;
+            newMovie.director = data.director;
+            newMovie.duration = data.duration;
+            newMovie.language = data.language;
+            newMovie.posterUrl = data.posterUrl;
+            newMovie.rating = data.rating;
+            newMovie.isActive = data.isActive;
+            newMovie.hashtags = allHashtags;
+
             await AppDataSource.getRepository(Movie).save(newMovie);
-            res.status(201).json({ message: "Movie created successfully", movies: newMovie });
-    
+            res.status(201).json({ message: "Movie created successfully", movie: newMovie });
+
         } catch (error) {
             console.error("Error creating movie:", error);
             res.status(500).json({ error: "Internal server error" });
