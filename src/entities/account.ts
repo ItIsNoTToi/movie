@@ -27,4 +27,7 @@ export class Account {
 
     @OneToOne(() => Admin, admin => admin.account)
     admin?: Admin;
+
+    @Column({ default: true })
+    isActived!: boolean;
 }

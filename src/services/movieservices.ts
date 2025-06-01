@@ -1,4 +1,5 @@
-import { Express, Request, Response } from "express";
+import { hash } from 'bcrypt-ts';
+import e, { Express, Request, Response } from "express";
 import { DataSource } from "typeorm";
 import { Movie } from "@entities/movie";
 import { AppDataSource } from "@config/data-source";
@@ -12,33 +13,34 @@ export default class MovieServices {
 
     static async createMovie(req: Request, res: Response): Promise<any> {
         try {
-            // chua luu genres
             const data = req.body;
-            //console.log(data);
 
-            const hashtagNames = ['#action', '#newrelease'];
+            // Kiểm tra dữ liệu
+            if (!Array.isArray(data.hashtag) || !Array.isArray(data.genres)) {
+                return res.status(400).json({ error: "Hashtag and genres must be arrays" });
+            }
 
             const hashtagRepo = AppDataSource.getRepository(Hashtag);
+
+            const hashtagNames: string[] = data.hashtag.map((item: { name: string }) => item.name);
 
             // Tìm các hashtag đã tồn tại
             const existingHashtags = await hashtagRepo.find({
                 where: { name: In(hashtagNames) }
             });
 
-            // Lấy ra danh sách name đã tồn tại
             const existingNames = existingHashtags.map(h => h.name);
 
             // Tạo những hashtag chưa có
             const newHashtags = hashtagNames
-                .filter(name => !existingNames.includes(name))
-                .map(name => hashtagRepo.create({ name }));
+                .filter((name: string) => !existingNames.includes(name))
+                .map((name: string) => hashtagRepo.create({ name }));
 
-            // Lưu mới vào DB
             await hashtagRepo.save(newHashtags);
 
-            // Tổng hợp hashtag để gán vào phim
             const allHashtags = [...existingHashtags, ...newHashtags];
 
+            // Tạo movie
             const newMovie = new Movie();
             newMovie.title = data.title;
             newMovie.description = data.description;
@@ -51,6 +53,18 @@ export default class MovieServices {
             newMovie.isActive = data.isActive;
             newMovie.hashtags = allHashtags;
 
+            // Xử lý genres
+            const genreRepo = AppDataSource.getRepository(Genre);
+            const genres = await genreRepo.findBy({
+                id: In(data.genres)
+            });
+
+            if (genres.length !== data.genres.length) {
+                return res.status(400).json({ error: "Some genre IDs are invalid" });
+            }
+
+            newMovie.genres = genres;
+
             await AppDataSource.getRepository(Movie).save(newMovie);
             res.status(201).json({ message: "Movie created successfully", movie: newMovie });
 
@@ -59,6 +73,7 @@ export default class MovieServices {
             res.status(500).json({ error: "Internal server error" });
         }
     }
+
 
     static async deleteMovie(req: Request, res: Response): Promise<any> {
         try {
