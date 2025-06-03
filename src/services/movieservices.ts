@@ -1,9 +1,9 @@
 import { hash } from 'bcrypt-ts';
 import e, { Express, Request, Response } from "express";
 import { DataSource } from "typeorm";
+import { Genre } from '@entities/genre';
 import { Movie } from "@entities/movie";
 import { AppDataSource } from "@config/data-source";
-import { Genre } from "@entities/genre";
 import { Episode } from "@entities/episode";
 import jwt from "jsonwebtoken";
 import { Hashtag } from "@entities/hashtag";
@@ -73,7 +73,6 @@ export default class MovieServices {
             res.status(500).json({ error: "Internal server error" });
         }
     }
-
 
     static async deleteMovie(req: Request, res: Response): Promise<any> {
         try {

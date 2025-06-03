@@ -17,18 +17,20 @@ export default class AdminServices {
 
     static async getAccount(req: Request, res: Response): Promise<any> {
         try {
-            const account = await this.accountrepo.find();
+            const accounts = await this.accountrepo.find({
+                relations: ['admin']
+            });
 
-            if(!account){
+            if(!accounts){
                 return res.status(400).json({ message: "can't find account"});
             }
 
-            return res.status(200).json({ account: account });
+            const result = accounts.map(({ password, ...rest }) => rest);
+            return res.status(200).json({ account: result });
         } catch (error) {
             console.log(error);
         }
     }
-
 
     static async blockAccount(req: Request, res: Response): Promise<any> {
         try {
@@ -52,7 +54,6 @@ export default class AdminServices {
                 message: `Account has been ${account.isActived ? 'unblocked' : 'blocked'}.`,
                 account 
             });
-
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: "Internal server error" });
@@ -70,7 +71,6 @@ export default class AdminServices {
             }
 
             await this.accountrepo.remove(account);
-
             return res.status(200).json({ message: "Account deleted successfully" });
         } catch (error) {
             console.log(error);

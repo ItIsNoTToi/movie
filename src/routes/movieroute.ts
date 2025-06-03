@@ -15,6 +15,4 @@ Routes.get('/movie', async (req: Request, res: Response) => {
     await MovieController.getMovie(req, res);
 });
 
-
-
 export default Routes;

@@ -18,6 +18,7 @@ import profileroutes from '@routes/profileroutes';
 import genresroutes from '@routes/genreroutes';
 import movieroutes from '@routes/movieroute';
 import adminroutes from "@routes/adminroutes";
+import accountroutes from "@routes/accountroutes";
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const app: Express = express();
@@ -77,4 +78,5 @@ app.use(profileroutes);
 app.use(genresroutes);
 app.use(movieroutes);
 app.use(adminroutes);
+app.use(accountroutes);
 
