@@ -93,15 +93,48 @@ export default class MovieServices {
         }
     }
 
+    static async deleteEpisode(req: Request, res: Response): Promise<any> {
+        try {
+            const epId = Number(req.params.epId);
+            const movieId = Number(req.params.movieId);
+
+            if (isNaN(epId) || isNaN(movieId)) {
+                return res.status(400).json({ message: "Invalid episode ID or movie ID" });
+            }
+
+            const movieRepo = AppDataSource.getRepository(Movie);
+            const movie = await movieRepo.findOneBy({ id: movieId });
+            if (!movie) {
+                return res.status(400).json({ message: "Can't find movie with id = " + movieId });
+            }
+
+            const epRepo = AppDataSource.getRepository(Episode);
+            const ep = await epRepo.findOne({ where: { 
+                id: epId, 
+                movie: movie,
+            } });
+            if (!ep) {
+                return res.status(400).json({ message: "Can't find ep of movie " + movie.title });
+            }
+
+            await epRepo.delete(epId);
+
+            res.status(200).json({ message: "Episode deleted successfully" });
+        } catch (error) {
+            console.error("Error deleting episode:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
     static async createEpisode(req: Request, res: Response): Promise<any> {
         try {
             const {
-                MovieId, title, description, releaseDate, episodeNumber, videoUrl, quality, views, subtitlesUrl, 
+                movieId, data
             } = req.body;
 
             const movie = await AppDataSource.getRepository(Movie).findOne({
                 where: {
-                    id: MovieId,
+                    id: movieId,
                 }
             })
 
@@ -110,18 +143,18 @@ export default class MovieServices {
             }
     
             const newEpisode = new Episode();
-            newEpisode.title = title;
-            newEpisode.description = description;
-            newEpisode.releaseDate = releaseDate;
-            newEpisode.episodeNumber = episodeNumber;
-            newEpisode.videoUrl = videoUrl;
-            newEpisode.quality = quality;
-            newEpisode.views = views;
-            newEpisode.subtitlesUrl = subtitlesUrl;
+            newEpisode.title = data.title;
+            newEpisode.description = data.description;
+            newEpisode.releaseDate = data.releaseDate;
+            newEpisode.episodeNumber = data.episodeNumber;
+            newEpisode.videoUrl = data.videoUrl;
+            newEpisode.quality = data.quality;
+            newEpisode.views = data.views;
+            newEpisode.subtitlesUrl = data.subtitlesUrl;
             newEpisode.movie = movie!;
     
             await AppDataSource.getRepository(Episode).save(newEpisode);
-            res.status(201).json({ message: "Episode created successfully", });
+            res.status(201).json({ message: "Episode created successfully", newEpisode: newEpisode });
     
         } catch (error) {
             console.error("Error creating Episode:", error);
@@ -131,7 +164,7 @@ export default class MovieServices {
     
     static async getMovieByIdAndEpisode(req: Request, res: Response): Promise<any> {
         try {
-            const movieId = parseInt(req.params.id);
+            const movieId = parseInt((req.params.id));
             const episodeNumber = parseInt(req.params.episode);
     
             if (isNaN(movieId) || isNaN(episodeNumber)) {
