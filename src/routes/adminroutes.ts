@@ -12,6 +12,6 @@ Routes.delete('/9710010910511011297103101/deleteMovie/:id', async (req: Request,
 
 Routes.post('/9710010910511011297103101/createEpisode', async (req: Request, res: Response) => await MovieController.createEpisode(req, res));
 
-Routes.delete('/9710010910511011297103101/y/:movieId/:epId', async (req: Request, res: Response) => await MovieController.deleteEpisode(req, res));
+Routes.delete('/9710010910511011297103101/:movieId/:epId', async (req: Request, res: Response) => await MovieController.deleteEpisode(req, res));
 
 export default Routes;
