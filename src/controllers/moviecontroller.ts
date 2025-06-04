@@ -7,6 +7,11 @@ export default class MovieController {
         await MovieServices.createMovie(req, res);
     }
 
+    static async editMovie(req: Request, res: Response): Promise<any> {
+        await MovieServices.editMovie(req, res);
+    }
+    
+
     static async deleteMovie(req: Request, res: Response): Promise<any> {
         await MovieServices.deleteMovie(req, res);
     }

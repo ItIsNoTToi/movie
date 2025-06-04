@@ -74,6 +74,73 @@ export default class MovieServices {
         }
     }
 
+    static async editMovie(req: Request, res: Response): Promise<any> {
+        try {
+            const data = req.body.data;
+            const id = req.body.movieId;
+
+            const hashtagRepo = AppDataSource.getRepository(Hashtag);
+
+            const hashtagNames: string[] = data.hashtag.map((item: { name: string }) => item.name);
+
+            // Tìm các hashtag đã tồn tại
+            const existingHashtags = await hashtagRepo.find({
+                where: { name: In(hashtagNames) }
+            });
+
+            const existingNames = existingHashtags.map(h => h.name);
+
+            // Tạo những hashtag chưa có
+            const newHashtags = hashtagNames
+                .filter((name: string) => !existingNames.includes(name))
+                .map((name: string) => hashtagRepo.create({ name }));
+
+            await hashtagRepo.save(newHashtags);
+
+            const allHashtags = [...existingHashtags, ...newHashtags];
+
+            // Tạo movie
+            const movie = await AppDataSource.getRepository(Movie).findOne({
+                where:{
+                    id: id
+                }
+            });
+
+            if(!movie){
+                return res.status(400).json({ message: "Can't find movie" });
+            }
+            movie.title = data.title;
+            movie.description = data.description;
+            movie.releaseDate = data.releaseDate;
+            movie.director = data.director;
+            movie.duration = data.duration;
+            movie.language = data.language;
+            movie.posterUrl = data.posterUrl;
+            movie.rating = data.rating;
+            movie.isActive = data.isActive;
+            movie.hashtags = allHashtags;
+
+            // Xử lý genres
+            const genreRepo = AppDataSource.getRepository(Genre);
+            const genres = await genreRepo.findBy({
+                id: In(data.genres)
+            });
+
+            if (genres.length !== data.genres.length) {
+                return res.status(400).json({ error: "Some genre IDs are invalid" });
+            }
+
+            movie.genres = genres;
+
+            await AppDataSource.getRepository(Movie).save(movie);
+            res.status(201).json({ message: "Movie edited successfully", movie: movie });
+
+        } catch (error) {
+            console.error("Error creating movie:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
     static async deleteMovie(req: Request, res: Response): Promise<any> {
         try {
             const id = Number(req.params.id);
