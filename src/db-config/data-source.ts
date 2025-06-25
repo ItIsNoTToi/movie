@@ -15,7 +15,7 @@ import { Hashtag } from "@entities/hashtag";
 export const AppDataSource = new DataSource({
     type: process.env.MYSQL_TYPE as "mysql",
     host: process.env.MYSQL_HOST,
-    port: 27243,
+    port: 3306,
     username: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASS,
     database: process.env.MYSQL_NAME,

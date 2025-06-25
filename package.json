@@ -8,7 +8,7 @@
     "migration:run": "typeorm migration:run",
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "nodemon -r tsconfig-paths/register src/app.ts",
-    "start": "node -r tsconfig-paths/register dist/app.js"
+    "start": "nodemon -r tsconfig-paths/register src/app.ts"
   },
   "keywords": [],
   "author": "",

@@ -10,7 +10,10 @@ export default class MovieController {
     static async editMovie(req: Request, res: Response): Promise<any> {
         await MovieServices.editMovie(req, res);
     }
-    
+
+    static async editEpisode(req: Request, res: Response): Promise<any> {
+        await MovieServices.editEpisode(req, res);
+    }
 
     static async deleteMovie(req: Request, res: Response): Promise<any> {
         await MovieServices.deleteMovie(req, res);

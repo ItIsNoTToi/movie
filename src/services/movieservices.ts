@@ -76,33 +76,29 @@ export default class MovieServices {
 
     static async editMovie(req: Request, res: Response): Promise<any> {
         try {
-            const data = req.body.data;
-            const id = req.body.movieId;
+            const data = req.body;
 
-            const hashtagRepo = AppDataSource.getRepository(Hashtag);
+            console.log( data);
 
-            const hashtagNames: string[] = data.hashtag.map((item: { name: string }) => item.name);
+            // const hashtagRepo = AppDataSource.getRepository(Hashtag);
+            // const hashtagNames: string[] = data.hashtag.map((item: { name: string }) => item.name);
+            // // Tìm các hashtag đã tồn tại
+            // const existingHashtags = await hashtagRepo.find({
+            //     where: { name: In(hashtagNames) }
+            // });
+            // const existingNames = existingHashtags.map(h => h.name);
+            // // Tạo những hashtag chưa có
+            // const newHashtags = hashtagNames
+            //     .filter((name: string) => !existingNames.includes(name))
+            //     .map((name: string) => hashtagRepo.create({ name }));
+            // await hashtagRepo.save(newHashtags);
+            // const allHashtags = [...existingHashtags, ...newHashtags];
 
-            // Tìm các hashtag đã tồn tại
-            const existingHashtags = await hashtagRepo.find({
-                where: { name: In(hashtagNames) }
-            });
-
-            const existingNames = existingHashtags.map(h => h.name);
-
-            // Tạo những hashtag chưa có
-            const newHashtags = hashtagNames
-                .filter((name: string) => !existingNames.includes(name))
-                .map((name: string) => hashtagRepo.create({ name }));
-
-            await hashtagRepo.save(newHashtags);
-
-            const allHashtags = [...existingHashtags, ...newHashtags];
-
-            // Tạo movie
+            // Tim movie
             const movie = await AppDataSource.getRepository(Movie).findOne({
                 where:{
-                    id: id
+                    title: data.title,
+                    director: data.director,
                 }
             });
 
@@ -115,28 +111,55 @@ export default class MovieServices {
             movie.director = data.director;
             movie.duration = data.duration;
             movie.language = data.language;
-            movie.posterUrl = data.posterUrl;
-            movie.rating = data.rating;
             movie.isActive = data.isActive;
-            movie.hashtags = allHashtags;
 
-            // Xử lý genres
-            const genreRepo = AppDataSource.getRepository(Genre);
-            const genres = await genreRepo.findBy({
-                id: In(data.genres)
-            });
-
-            if (genres.length !== data.genres.length) {
-                return res.status(400).json({ error: "Some genre IDs are invalid" });
-            }
-
-            movie.genres = genres;
+            // // Xử lý genres
+            // const genreRepo = AppDataSource.getRepository(Genre);
+            // const genres = await genreRepo.findBy({
+            //     id: In(data.genres)
+            // });
+            // if (genres.length !== data.genres.length) {
+            //     return res.status(400).json({ error: "Some genre IDs are invalid" });
+            // }
+            // movie.genres = genres;
 
             await AppDataSource.getRepository(Movie).save(movie);
             res.status(201).json({ message: "Movie edited successfully", movie: movie });
 
         } catch (error) {
-            console.error("Error creating movie:", error);
+            console.error("Error editting movie:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
+    static async editEpisode(req: Request, res: Response): Promise<any> {
+        try {
+            const data = req.body;
+
+            // console.log(data);
+
+            const episode = await AppDataSource.getRepository(Episode).findOne({
+                where: {
+                    movie: data.movieId,
+                    id: data.epId
+                }
+            });
+
+            if( !episode ){
+                return res.status(400).json({ message: "Can't find episode" });
+            }
+            
+            episode.title = data.data.title;
+            episode.description = data.data.description;
+            episode.episodeNumber = data.data.episodeNumber;
+            episode.videoUrl = data.data.videoUrl;
+            episode.releaseDate = data.data.releaseDate;
+
+            await AppDataSource.getRepository(Episode).save(episode);
+            res.status(201).json({ message: "Epiosode edited successfully", EP: episode });
+
+        } catch (error) {
+            console.error("Error editting EP:", error);
             res.status(500).json({ error: "Internal server error" });
         }
     }
