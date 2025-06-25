@@ -39,4 +39,9 @@ export default class MovieController {
     static async getMovie(req: Request, res: Response): Promise<any> {
         await MovieServices.getMovie(req, res);
     }
+
+    static async findmovies(req: Request, res: Response): Promise<any> {
+        await MovieServices.findmovies(req, res);
+    }
+
 }

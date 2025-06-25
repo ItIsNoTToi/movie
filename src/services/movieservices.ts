@@ -1,6 +1,6 @@
 import { hash } from 'bcrypt-ts';
 import e, { Express, Request, Response } from "express";
-import { DataSource } from "typeorm";
+import { DataSource, Like } from "typeorm";
 import { Genre } from '@entities/genre';
 import { Movie } from "@entities/movie";
 import { AppDataSource } from "@config/data-source";
@@ -8,6 +8,7 @@ import { Episode } from "@entities/episode";
 import jwt from "jsonwebtoken";
 import { Hashtag } from "@entities/hashtag";
 import { In } from "typeorm";
+import { time } from 'console';
 
 export default class MovieServices {
 
@@ -323,7 +324,7 @@ export default class MovieServices {
                 where: {
                     id: movieId,
                 },
-                relations: ['episodes', 'genres'],  // Trả về cả thông tin của episodes và genres
+                relations: ['episodes', 'genres', 'hashtags'],  // Trả về cả thông tin của episodes và genres
             });
     
             if (!movie) {
@@ -338,4 +339,45 @@ export default class MovieServices {
         }
     }
     
+    static async findmovies(req: Request, res: Response): Promise<any> {
+        try {
+            const { category, hashtag, name, releaseDate, author } = req.body;
+
+            const query: any = {};
+
+            // if (category && category !== 'All') {
+            //     query.category = category;
+            // }
+
+            // if (hashtag?.trim()) {
+            //     query.hashtags = Like(`%${hashtag}%`);
+            // }
+
+            if (name?.trim()) {
+                query.title = Like(`%${name}%`);
+            }
+
+            if (releaseDate?.trim()) {
+                query.releaseDate = releaseDate;
+            }
+
+            if (author?.trim()) {
+                query.director = Like(`%${author}%`);
+            }
+
+            const filtered = await AppDataSource.getRepository(Movie).find({
+                where: query,
+                relations: ['genres', 'hashtags'],
+            });
+
+            return res.status(200).json({
+                data: filtered,
+                
+            });
+        } catch (error: any) {
+            console.error("Error find movie:", error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
 }
