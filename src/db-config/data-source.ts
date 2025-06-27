@@ -11,6 +11,7 @@ import { Genre } from "@entities/genre";
 import { Episode } from "@entities/episode";
 import { Admin } from "@entities/admin";
 import { Hashtag } from "@entities/hashtag";
+import { Rating } from "@entities/rating";
 
 export const AppDataSource = new DataSource({
     type: process.env.MYSQL_TYPE as "mysql",
@@ -24,7 +25,7 @@ export const AppDataSource = new DataSource({
     ssl: {
         rejectUnauthorized: false,
     },
-    entities: [Movie, Account, DetailAccount, Genre, Episode, Admin, Hashtag],
+    entities: [Movie, Account, DetailAccount, Genre, Episode, Admin, Hashtag, Rating],
     subscribers: [],
     migrations: ["src/migrations/*.ts"],
 });

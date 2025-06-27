@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from "typeorm";
 import { DetailAccount } from "./detailaccount";
 import { Admin } from "./admin";
+import { Rating } from "./rating";
 
 @Entity('account')
 export class Account {
@@ -27,6 +28,9 @@ export class Account {
 
     @OneToOne(() => Admin, admin => admin.account)
     admin?: Admin;
+
+    @OneToMany(() => Rating, rating => rating.account)
+    ratings!: Rating[];
 
     @Column({ default: true })
     isActived!: boolean;
