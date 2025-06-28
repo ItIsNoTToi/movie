@@ -8,4 +8,7 @@ export default class RatingController {
         await RatingServices.GetRatingAndComment(req, res);
     }
 
+    static async postcommentandrating(req: Request, res: Response): Promise<any> {
+        await RatingServices.postcommentandrating(req, res);
+    }
 }

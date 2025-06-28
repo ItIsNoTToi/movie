@@ -10,5 +10,7 @@ const router = express.Router();
 // Route để lấy thông tin profile của người dùng
 router.get('/getcommentandrating/:idmovie', RatingController.GetRatingAndComment );
 
+router.post('/postcommentandrating', RatingController.postcommentandrating );
+
 export default router;
 //end{code}

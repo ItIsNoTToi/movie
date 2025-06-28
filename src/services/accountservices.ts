@@ -83,8 +83,6 @@ export default class AccountServices {
                 return res.status(404).json({ message: "Account don't have role" });
             }
 
-
-
             // Tạo JWT token
             const token = jwt.sign(
                 { id: account.id, email: account.email, username: account.username },
@@ -102,12 +100,12 @@ export default class AccountServices {
             return res.status(200).json({
                 message: "Login successful",
                 token: token,
-                role: role.role
-                // account: {
-                //     id: account.id,
-                //     username: account.username,
-                //     email: account.email
-                // }
+                role: role.role,
+                user: {
+                    id: account.id,
+                    username: account.username,
+                    email: account.email
+                }
             });
         } catch (error) {
             console.error(error);
