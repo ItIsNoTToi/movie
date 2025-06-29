@@ -11,6 +11,7 @@ import {
   import { Episode } from "./episode";
 import { Hashtag } from "./hashtag";
 import { Rating } from "./rating";
+import { WatchHistory } from "./watchhistory";
   
   @Entity('movie')
   export class Movie {
@@ -58,5 +59,8 @@ import { Rating } from "./rating";
     @ManyToMany(() => Hashtag, hashtag => hashtag.movies, { cascade: true })
     @JoinTable()
     hashtags!: Hashtag[];
+
+    @OneToMany(() => WatchHistory, wh => wh.movie)
+    watchHistory!:  WatchHistory[];
   }
   

@@ -1,3 +1,4 @@
+import { WatchHistory } from './entities/watchhistory';
 import express, { Express, Request, Response} from "express";
 import http from 'http';
 import dotenv from "dotenv";
@@ -20,6 +21,7 @@ import movieroutes from '@routes/movieroute';
 import adminroutes from "@routes/adminroutes";
 import accountroutes from "@routes/accountroutes";
 import ratingroutes from "@routes/ratingroutes";
+import watchhistoryroutes from "@routes/watchhistoryroutes";
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const app: Express = express();
@@ -80,4 +82,5 @@ app.use(genresroutes);
 app.use(movieroutes);
 app.use(adminroutes);
 app.use(accountroutes);
-app.use(ratingroutes)
+app.use(ratingroutes);
+app.use(watchhistoryroutes);

@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from "typ
 import { DetailAccount } from "./detailaccount";
 import { Admin } from "./admin";
 import { Rating } from "./rating";
+import { WatchHistory } from "./watchhistory";
 
 @Entity('account')
 export class Account {
@@ -34,4 +35,7 @@ export class Account {
 
     @Column({ default: true })
     isActived!: boolean;
+
+    @OneToMany(() => WatchHistory, wh => wh.movie)
+    watchHistory!:  WatchHistory[];
 }
